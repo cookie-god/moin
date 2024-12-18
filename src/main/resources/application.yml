@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: moin
+  profiles:
+    active: ${APP_ENV:local}
