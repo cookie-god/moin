@@ -6,8 +6,8 @@ spring:
 
   datasource:
     driver-class-name: org.h2.Driver
-    url: 'jdbc:h2:mem:testdb'
-    username: koo
+    url: jdbc:h2:mem:test
+    username: sa
     password: qwer1234
     hikari:
       maximum-pool-size: 10

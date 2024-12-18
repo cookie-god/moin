@@ -7,9 +7,6 @@ import kisung.moin.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -34,7 +31,7 @@ public class SecurityConfig {
 
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
-    return (web) -> web.ignoring().requestMatchers("/swagger-ui/**", "/v3/api-docs/**");  // /public 경로는 시큐리티 필터 체인에서 제외
+    return (web) -> web.ignoring().requestMatchers("/h2/**", "/swagger-ui/**", "/v3/api-docs/**");  // /public 경로는 시큐리티 필터 체인에서 제외
   }
 
   /**
