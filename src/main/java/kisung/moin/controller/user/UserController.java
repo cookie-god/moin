@@ -21,7 +21,7 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping(value = "/signup")
-  public BasicResponse<UserDto.PostSignUpRes> postSignUp(@RequestBody UserDto.PostSignUpReq postSignUpReq) {
+  public BasicResponse<UserDto.PostSignUpRes> postSignUp(@RequestBody UserDto.PostSignUpReq postSignUpReq) throws Exception {
     return BasicResponse.success(userService.createUsers(postSignUpReq), CREATE_SUCCESS);
   }
 }

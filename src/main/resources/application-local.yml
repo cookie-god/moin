@@ -33,3 +33,6 @@ spring:
 jwt:
   expiration_time: 259200000 #3일
   secret: cookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegod
+
+aes:
+  secret: mySuperSecretKey1234567890123456

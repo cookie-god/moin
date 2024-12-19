@@ -1,5 +1,6 @@
 package kisung.moin.service.user;
 
+import kisung.moin.config.AESUtil;
 import kisung.moin.config.exception.MoinException;
 import kisung.moin.config.jwt.JwtTokenProvider;
 import kisung.moin.dto.UserDto;
@@ -22,16 +23,18 @@ import static kisung.moin.enums.Status.ACTIVE;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
+  private final AESUtil aesUtil;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
 
 
   @Transactional
   @Override
-  public UserDto.PostSignUpRes createUsers(UserDto.PostSignUpReq postSignUpReq) {
+  public UserDto.PostSignUpRes createUsers(UserDto.PostSignUpReq postSignUpReq) throws Exception {
     validate(postSignUpReq);
     UserInfo userInfo = CreateUserEntity(postSignUpReq);
     userInfo = userInfo.hashPassword(bCryptPasswordEncoder);
+    userInfo.encryptIdValue(aesUtil.encrypt(postSignUpReq.getIdValue()));
     userInfo = userRepository.save(userInfo);
     return UserDto.PostSignUpRes.builder()
         .id(userInfo.getId())
