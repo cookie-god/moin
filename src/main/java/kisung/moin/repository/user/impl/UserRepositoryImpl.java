@@ -31,4 +31,17 @@ public class UserRepositoryImpl implements CustomUserRepository {
             .fetchFirst()
     );
   }
+
+  @Override
+  public boolean existsByUserId(String userId) {
+    Integer fetchOne = jpaQueryFactory
+        .selectOne()
+        .from(userInfo)
+        .where(
+            userInfo.userId.eq(userId),
+            userInfo.status.eq(ACTIVE.value())
+        )
+        .fetchFirst();
+    return fetchOne != null;
+  }
 }

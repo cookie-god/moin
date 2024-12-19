@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface CustomUserRepository {
   Optional<UserInfo> findUserInfoById(Long userId);
+  boolean existsByUserId(String userId);
 }

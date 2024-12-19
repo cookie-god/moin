@@ -3,6 +3,7 @@ package kisung.moin.service.user;
 import kisung.moin.config.exception.MoinException;
 import kisung.moin.config.jwt.JwtTokenProvider;
 import kisung.moin.dto.UserDto;
+import kisung.moin.entity.UserInfo;
 import kisung.moin.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,8 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static kisung.moin.common.code.ErrorCode.*;
 import static kisung.moin.enums.IdType.*;
+import static kisung.moin.enums.Status.ACTIVE;
 
 @Slf4j
 @Service
@@ -26,11 +30,27 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserDto.PostSignUpRes createUsers(UserDto.PostSignUpReq postSignUpReq) {
     validate(postSignUpReq);
+    UserInfo userInfo = CreateUserEntity(postSignUpReq);
+    userInfo = userInfo.hashPassword(bCryptPasswordEncoder);
+    userInfo = userRepository.save(userInfo);
     return UserDto.PostSignUpRes.builder()
-        .id(1L)
+        .id(userInfo.getId())
         .build();
   }
 
+  /**
+   * 유저 회원 가입 validate
+   * request에 대한 값 체크하는 메서드
+   * 1. 이메일 값 존재 여부 체크
+   * 2. 이메일 정규식 체크
+   * 3. 비밀번호 값 존재 여부 체크
+   * 4. 비밀번호 정규식 체크
+   * 5. 이름 존재 여부 체크
+   * 6. 아이디 타입 존재 여부 체크
+   * 7. 아이디 타입 값 체크
+   * 8. 아이디 값 정규식 체크
+   * 9. 이메일 중복 체크
+   */
   private void validate(UserDto.PostSignUpReq postSignUpReq) {
     if (postSignUpReq.getUserId() == null || postSignUpReq.getUserId().isEmpty()) {
       throw new MoinException(NON_EXIST_EMAIL);
@@ -66,12 +86,25 @@ public class UserServiceImpl implements UserService {
         throw new MoinException(INVALID_BUSINESS_ID_VALUE);
       }
     }
+    if (userRepository.existsByUserId(postSignUpReq.getUserId())) {
+      throw new MoinException(DUPLICATE_EMAIL);
+    }
+  }
 
-//    if (userRepository.existsByEmail(postUserReq.getEmail())) {
-//      throw new BoardException(DUPLICATE_EMAIL);
-//    }
-//    if (userRepository.existsByNickname(postUserReq.getNickname())) {
-//      throw new BoardException(DUPLICATE_NICKNAME);
-//    }
+  /**
+   * 유저 엔티티 인스턴스 생성하는 메서드
+   */
+  private UserInfo CreateUserEntity(UserDto.PostSignUpReq postSignUpReq) {
+    LocalDateTime now = LocalDateTime.now();
+    return UserInfo.builder()
+        .userId(postSignUpReq.getUserId())
+        .name(postSignUpReq.getName())
+        .password(postSignUpReq.getPassword())
+        .idType(postSignUpReq.getIdType())
+        .idValue(postSignUpReq.getIdValue())
+        .createdAt(now)
+        .updatedAt(now)
+        .status(ACTIVE.value())
+        .build();
   }
 }

@@ -19,11 +19,11 @@ public enum ErrorCode {
   NON_EXIST_ID_VALUE(400, "USER_ERROR_008", "Id Value is empty"),
   INVALID_REG_ID_VALUE(400, "USER_ERROR_009", "Reg Id Value is invalid"),
   INVALID_BUSINESS_ID_VALUE(400, "USER_ERROR_010", "Business Id Value is invalid"),
-  DUPLICATE_EMAIL(404, "USER_ERROR_007", "email is already exist"),
-  DUPLICATE_NICKNAME(404, "USER_ERROR_008", "Nickname is already exist"),
-  NOT_EXIST_USER_BY_EMAIL(404, "USER_ERROR_009", "User's email is not exist."),
-  WRONG_PASSWORD(404, "USER_ERROR_010", "User's password is wrong."),
-  NON_EXIST_USER(404, "USER_ERROR_011", "Not exist user"),
+  DUPLICATE_EMAIL(404, "USER_ERROR_011", "email is already exist"),
+  DUPLICATE_NICKNAME(404, "USER_ERROR_012", "Nickname is already exist"),
+  NOT_EXIST_USER_BY_EMAIL(404, "USER_ERROR_013", "User's email is not exist."),
+  WRONG_PASSWORD(404, "USER_ERROR_014", "User's password is wrong."),
+  NON_EXIST_USER(404, "USER_ERROR_015", "Not exist user"),
 
 
   INTERNAL_SERVER_ERROR(500, "SERVER_ERROR_001", "Server Error");
