@@ -41,6 +41,26 @@ public class UserServiceImpl implements UserService {
         .build();
   }
 
+  @Override
+  public UserDto.PostLoginRes login(UserDto.PostLoginReq postLoginReq) {
+    validate(postLoginReq);
+    UserInfo userInfo = userRepository.findUserInfoByUserId(postLoginReq.getUserId()).orElseThrow(() -> new MoinException(NON_EXIST_USER));
+    if (!userInfo.checkPassword(postLoginReq.getPassword(), bCryptPasswordEncoder)) { // 비밀번호 확인
+      throw new MoinException(WRONG_PASSWORD);
+    }
+    String token = jwtTokenProvider.createAccessToken(
+        UserDto.UserBasicInfo.builder()
+            .id(userInfo.getId())
+            .userId(userInfo.getUserId())
+            .name(userInfo.getName())
+            .idType(userInfo.getIdType())
+            .build()
+    );
+    return UserDto.PostLoginRes.builder()
+        .token(token)
+        .build();
+  }
+
   /**
    * 유저 회원 가입 validate
    * request에 대한 값 체크하는 메서드
@@ -91,6 +111,29 @@ public class UserServiceImpl implements UserService {
     }
     if (userRepository.existsByUserId(postSignUpReq.getUserId())) {
       throw new MoinException(DUPLICATE_EMAIL);
+    }
+  }
+
+  /**
+   * 유저 로그인 validate
+   * request에 대한 값 체크하는 메서드
+   * 1. 이메일 값 존재 여부 체크
+   * 2. 이메일 정규식 체크
+   * 3. 비밀번호 값 존재 여부 체크
+   * 4. 비밀번호 정규식 체크
+   */
+  public void validate(UserDto.PostLoginReq postLoginReq) {
+    if (postLoginReq.getUserId() == null || postLoginReq.getUserId().isEmpty()) {
+      throw new MoinException(NON_EXIST_EMAIL);
+    }
+    if (!postLoginReq.validateUserId()) {
+      throw new MoinException(INVALID_EMAIL);
+    }
+    if (postLoginReq.getPassword() == null || postLoginReq.getPassword().isEmpty()) {
+      throw new MoinException(NON_EXIST_PASSWORD);
+    }
+    if (!postLoginReq.validatePassword()) {
+      throw new MoinException(INVALID_PASSWORD);
     }
   }
 

@@ -48,6 +48,31 @@ public class UserDto {
     private Long id;
   }
 
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class PostLoginReq {
+    @Schema(description = "유저 아이디(이메일)", example = "lion0193@gmail.com")
+    private String userId;
+    @Schema(description = "비밀번호 (영문 숫자 특수기호 조합 8자리 이상)", example = "qwer1234!")
+    private String password;
+
+    public boolean validateUserId() {
+      return Pattern.matches(USER_ID_PATTERN, userId);
+    }
+    public boolean validatePassword() {
+      return Pattern.matches(PASSWORD_PATTERN, password);
+    }
+  }
+
+  @Getter
+  @Builder
+  public static class PostLoginRes {
+    @Schema(description = "jwt 토큰", example = "asdasdasd")
+    private String token;
+  }
+
   @Getter
   @Builder
   public static class UserBasicInfo {

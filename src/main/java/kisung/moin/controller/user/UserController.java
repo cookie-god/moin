@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static kisung.moin.common.code.SuccessCode.CREATE_SUCCESS;
+import static kisung.moin.common.code.SuccessCode.READ_SUCCESS;
 
 @RestController
 @RequestMapping(value = "/users", consumes = "application/json", produces = "application/json")
@@ -23,5 +24,10 @@ public class UserController {
   @PostMapping(value = "/signup")
   public BasicResponse<UserDto.PostSignUpRes> postSignUp(@RequestBody UserDto.PostSignUpReq postSignUpReq) throws Exception {
     return BasicResponse.success(userService.createUsers(postSignUpReq), CREATE_SUCCESS);
+  }
+
+  @PostMapping(value = "/login")
+  public BasicResponse<UserDto.PostLoginRes> postLogin(@RequestBody UserDto.PostLoginReq postLoginReq) throws Exception {
+    return BasicResponse.success(userService.login(postLoginReq), READ_SUCCESS);
   }
 }

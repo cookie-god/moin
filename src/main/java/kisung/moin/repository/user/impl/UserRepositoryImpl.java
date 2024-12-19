@@ -44,4 +44,19 @@ public class UserRepositoryImpl implements CustomUserRepository {
         .fetchFirst();
     return fetchOne != null;
   }
+
+  @Override
+  public Optional<UserInfo> findUserInfoByUserId(String userId) {
+    return Optional.ofNullable(
+        jpaQueryFactory
+            .select(userInfo)
+            .from(userInfo)
+            .where(
+                userInfo.userId.eq(userId),
+                userInfo.status.eq(ACTIVE.value())
+            )
+            .fetchFirst()
+
+    );
+  }
 }
