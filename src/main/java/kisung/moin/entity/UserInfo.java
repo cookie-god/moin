@@ -16,8 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class UserInfo extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
   @Column(name = "user_id")
-  private Long userId;
+  private String userId;
 
   @Column(name = "password")
   private String password;

@@ -12,7 +12,9 @@ public class UserDto {
   @Builder
   public static class UserBasicInfo {
     @Schema(description = "유저 아이디", example = "1")
-    private Long userId;
+    private Long id;
+    @Schema(description = "유저 이메일 아이디", example = "lion0193@gmail.com")
+    private String userId;
     @Schema(description = "이름", example = "구기성")
     private String name;
     @Schema(description = "회원 유형", example = "REG_NO")

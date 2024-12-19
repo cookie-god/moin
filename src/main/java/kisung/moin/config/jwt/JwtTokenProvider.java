@@ -23,7 +23,7 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtTokenProvider {
-
+  private static final String TOKEN_ID = "id";
   private static final String TOKEN_USER_ID = "userId";
   private static final String TOKEN_NAME = "name";
   private static final String TOKEN_ID_TYPE = "idType";
@@ -59,6 +59,7 @@ public class JwtTokenProvider {
    */
   private String createToken(UserDto.UserBasicInfo userBasicInfo, long expireTime) {
     Claims claims = Jwts.claims();
+    claims.put(TOKEN_ID, userBasicInfo.getId());
     claims.put(TOKEN_USER_ID, userBasicInfo.getUserId());
     claims.put(TOKEN_NAME, userBasicInfo.getName());
     claims.put(TOKEN_ID_TYPE, userBasicInfo.getIdType());

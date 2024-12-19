@@ -1,5 +1,6 @@
 package kisung.moin.controller.user;
 
+import kisung.moin.common.response.BasicResponse;
 import kisung.moin.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

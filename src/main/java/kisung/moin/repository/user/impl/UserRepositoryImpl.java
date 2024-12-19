@@ -19,13 +19,13 @@ public class UserRepositoryImpl implements CustomUserRepository {
   private final JPAQueryFactory jpaQueryFactory;
 
   @Override
-  public Optional<UserInfo> findUserInfoById(Long userId) {
+  public Optional<UserInfo> findUserInfoById(Long id) {
     return Optional.ofNullable(
         jpaQueryFactory
             .select(userInfo)
             .from(userInfo)
             .where(
-                userInfo.userId.eq(userId),
+                userInfo.id.eq(id),
                 userInfo.status.eq(ACTIVE.value())
             )
             .fetchFirst()
