@@ -36,3 +36,6 @@ jwt:
 
 aes:
   secret: mySuperSecretKey1234567890123456
+
+server:
+  fcm-server-url: http://crix-api-cdn.upbit.com
