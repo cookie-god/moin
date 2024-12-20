@@ -24,9 +24,9 @@ import static kisung.moin.common.code.SuccessCode.*;
 public class TransferController {
   private final TransferService transferService;
 
-  @PostMapping(value = "/quote")
-  public BasicResponse<TransferDto.PostQuoteRes> postQuote(@RequestBody TransferDto.PostQuoteReq postQuoteReq) throws Exception {
-    UserInfo userInfo = SecurityUtil.getUser().orElseThrow(() -> new MoinException(ErrorCode.NON_EXIST_USER));
-    return BasicResponse.success(transferService.retrieveQuote(userInfo, postQuoteReq), READ_SUCCESS);
-  }
+//  @PostMapping(value = "/quote")
+//  public BasicResponse<TransferDto.PostQuoteRes> postQuote(@RequestBody TransferDto.PostQuoteReq postQuoteReq) throws Exception {
+//    UserInfo userInfo = SecurityUtil.getUser().orElseThrow(() -> new MoinException(ErrorCode.NON_EXIST_USER));
+//    return BasicResponse.success(transferService.retrieveQuote(userInfo, postQuoteReq), READ_SUCCESS);
+//  }
 }
