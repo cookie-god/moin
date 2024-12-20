@@ -27,7 +27,7 @@ public class UserController {
   }
 
   @PostMapping(value = "/login")
-  public BasicResponse<UserDto.PostLoginRes> postLogin(@RequestBody UserDto.PostLoginReq postLoginReq) throws Exception {
+  public BasicResponse<UserDto.PostLoginRes> postLogin(@RequestBody UserDto.PostLoginReq postLoginReq) {
     return BasicResponse.success(userService.login(postLoginReq), READ_SUCCESS);
   }
 }
