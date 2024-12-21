@@ -1,6 +1,5 @@
 package kisung.moin.controller.user;
 
-import kisung.moin.common.code.SuccessCode;
 import kisung.moin.common.response.BasicResponse;
 import kisung.moin.dto.UserDto;
 import kisung.moin.service.user.UserService;
