@@ -20,10 +20,13 @@ public enum ErrorCode {
   INVALID_REG_ID_VALUE(400, "USER_ERROR_009", "Reg Id Value is invalid"),
   INVALID_BUSINESS_ID_VALUE(400, "USER_ERROR_010", "Business Id Value is invalid"),
   DUPLICATE_EMAIL(404, "USER_ERROR_011", "email is already exist"),
-  DUPLICATE_NICKNAME(404, "USER_ERROR_012", "Nickname is already exist"),
-  NOT_EXIST_USER_BY_EMAIL(404, "USER_ERROR_013", "User's email is not exist."),
-  WRONG_PASSWORD(404, "USER_ERROR_014", "User's password is wrong."),
-  NON_EXIST_USER(404, "USER_ERROR_015", "Not exist user"),
+  WRONG_PASSWORD(404, "USER_ERROR_012", "User's password is wrong."),
+  NON_EXIST_USER(404, "USER_ERROR_013", "Not exist user"),
+
+  NON_EXIST_AMOUNT(400, "QUOTE_ERROR_001", "Amount is empty"),
+  INVALID_AMOUNT(400, "QUOTE_ERROR_002", "Amount is negative number"),
+  NON_EXIST_TARGET_CURRENCY(400, "QUOTE_ERROR_003", "Target Currency is empty"),
+  INVALID_TARGET_CURRENCY(400, "QUOTE_ERROR_004", "Target Currency is only JPY, USD"),
 
   WEB_CLIENT_ERROR(404, "CALL_ERROR_001", "Client error in Other Server"),
   WEB_SERVER_ERROR(404, "CALL_ERROR_002", "Error in Other Server"),

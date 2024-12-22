@@ -28,7 +28,7 @@ public class WebClientService {
   public List<TransferDto.UpbitInfo> retrieveUpbitPriceInfo() {
     return webClient
         .get()
-        .uri(upbitServerUrl + "/v1/forex/recent")
+        .uri(upbitServerUrl + "/v1/forex/recent?codes=,FRX.KRWJPY,FRX.KRWUSD")
         .retrieve()
         .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.just(new MoinException(WEB_CLIENT_ERROR))) // 에러 체크
         .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.just(new MoinException(WEB_SERVER_ERROR))) // 에러 체크
@@ -36,9 +36,6 @@ public class WebClientService {
         .timeout(Duration.ofSeconds(5)) // 5초 응답 체크
         .doOnError(e -> log.info("error 발생"))
         .onErrorResume(e -> Mono.empty())
-        .block()
-        .stream()
-        .filter(data -> data.getCode().equals("FRX.KRWJPY") || data.getCode().equals("FRX.KRWUSD"))
-        .toList();
+        .block();
   }
 }

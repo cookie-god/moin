@@ -5,6 +5,8 @@ import kisung.moin.config.filter.LoggingFilter;
 import kisung.moin.config.jwt.JwtTokenProvider;
 import kisung.moin.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,6 +30,13 @@ public class SecurityConfig {
     return new BCryptPasswordEncoder();
   }
 
+  @Bean
+  @ConditionalOnProperty(name = "spring.h2.console.enabled",havingValue = "true")
+  public WebSecurityCustomizer configureH2ConsoleEnable() {
+    return web -> web.ignoring()
+        .requestMatchers(PathRequest.toH2Console());
+  }
+
   /**
    * 필터 설정
    */
@@ -39,7 +48,7 @@ public class SecurityConfig {
             .requestMatchers("/users/**").permitAll()  // 모든 요청을 허용
             .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()  // 모든 요청을 허용
             .requestMatchers("/h2/**").permitAll()  // 모든 요청을 허용
-            .anyRequest().authenticated()
+            .anyRequest().permitAll()
         )
         .addFilterBefore(new LoggingFilter(), UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, authService), LoggingFilter.class)

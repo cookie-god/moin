@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserDto.PostSignUpRes createUsers(UserDto.PostSignUpReq postSignUpReq) throws Exception {
     validate(postSignUpReq);
-    UserInfo userInfo = CreateUserEntity(postSignUpReq);
+    UserInfo userInfo = createUserEntity(postSignUpReq);
     userInfo = userInfo.hashPassword(bCryptPasswordEncoder);
     userInfo.encryptIdValue(aesUtil.encrypt(postSignUpReq.getIdValue()));
     userRepository.save(userInfo);
@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
   /**
    * 유저 엔티티 인스턴스 생성하는 메서드
    */
-  private UserInfo CreateUserEntity(UserDto.PostSignUpReq postSignUpReq) {
+  private UserInfo createUserEntity(UserDto.PostSignUpReq postSignUpReq) {
     LocalDateTime now = LocalDateTime.now();
     return UserInfo.builder()
         .userId(postSignUpReq.getUserId())

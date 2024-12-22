@@ -24,6 +24,6 @@ public class TransferController {
   @PostMapping(value = "/quote")
   public TransferDto.PostQuoteRes postQuote(@RequestBody TransferDto.PostQuoteReq postQuoteReq) throws Exception {
     UserInfo userInfo = SecurityUtil.getUser().orElseThrow(() -> new MoinException(NON_EXIST_USER));
-    return transferService.retrieveQuote(userInfo, postQuoteReq);
+    return transferService.createQuotes(userInfo, postQuoteReq);
   }
 }
