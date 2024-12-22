@@ -28,12 +28,6 @@ public class SecurityConfig {
     return new BCryptPasswordEncoder();
   }
 
-
-  @Bean
-  public WebSecurityCustomizer webSecurityCustomizer() {
-    return (web) -> web.ignoring().requestMatchers("/h2/**", "/swagger-ui/**", "/v3/api-docs/**");  // /public 경로는 시큐리티 필터 체인에서 제외
-  }
-
   /**
    * 필터 설정
    */
@@ -45,7 +39,7 @@ public class SecurityConfig {
             .requestMatchers("/users/**").permitAll()  // 모든 요청을 허용
             .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()  // 모든 요청을 허용
             .requestMatchers("/h2/**").permitAll()  // 모든 요청을 허용
-            .anyRequest().permitAll()
+            .anyRequest().authenticated()
         )
         .addFilterBefore(new LoggingFilter(), UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, authService), LoggingFilter.class)

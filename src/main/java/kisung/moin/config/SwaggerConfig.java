@@ -27,7 +27,7 @@ public class SwaggerConfig {
   private Info apiInfo() {
     return new Info()
         .title("moin swagger")
-        .description("모인WebConfig API 입니다.")
+        .description("모인 API 입니다.")
         .version("1.0.0");
   }
 }
