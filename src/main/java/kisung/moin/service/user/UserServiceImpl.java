@@ -35,10 +35,8 @@ public class UserServiceImpl implements UserService {
     UserInfo userInfo = CreateUserEntity(postSignUpReq);
     userInfo = userInfo.hashPassword(bCryptPasswordEncoder);
     userInfo.encryptIdValue(aesUtil.encrypt(postSignUpReq.getIdValue()));
-    userInfo = userRepository.save(userInfo);
-    return UserDto.PostSignUpRes.builder()
-        .id(userInfo.getId())
-        .build();
+    userRepository.save(userInfo);
+    return UserDto.PostSignUpRes.builder().build();
   }
 
   @Override

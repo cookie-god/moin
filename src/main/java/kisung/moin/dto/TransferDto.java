@@ -1,7 +1,9 @@
 package kisung.moin.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kisung.moin.common.response.BasicResponse;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 public class TransferDto {
 
@@ -17,8 +19,8 @@ public class TransferDto {
   }
 
   @Getter
-  @Builder
-  public static class PostQuoteRes {
+  @SuperBuilder
+  public static class PostQuoteRes extends BasicResponse {
     @Schema(description = "체크용", example = "1")
     private Long id;
   }

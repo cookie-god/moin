@@ -1,6 +1,5 @@
 package kisung.moin.controller.user;
 
-import kisung.moin.common.response.BasicResponse;
 import kisung.moin.dto.UserDto;
 import kisung.moin.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static kisung.moin.common.code.SuccessCode.CREATE_SUCCESS;
-import static kisung.moin.common.code.SuccessCode.READ_SUCCESS;
-
 @RestController
 @RequestMapping(value = "/users", consumes = "application/json", produces = "application/json")
 @RequiredArgsConstructor
@@ -22,16 +18,12 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping(value = "/signup")
-  public ResponseEntity<BasicResponse> postSignUp(@RequestBody UserDto.PostSignUpReq postSignUpReq) throws Exception {
-    BasicResponse response = BasicResponse.success(CREATE_SUCCESS);
-    userService.createUsers(postSignUpReq);
-    return ResponseEntity.ok(response);
+  public ResponseEntity<UserDto.PostSignUpRes> postSignUp(@RequestBody UserDto.PostSignUpReq postSignUpReq) throws Exception {
+    return ResponseEntity.ok(userService.createUsers(postSignUpReq));
   }
 
   @PostMapping(value = "/login")
-  public ResponseEntity<BasicResponse> postLogin(@RequestBody UserDto.PostLoginReq postLoginReq) {
-    BasicResponse response = BasicResponse.success(READ_SUCCESS);
-    response.addField("token", userService.login(postLoginReq).getToken());
-    return ResponseEntity.ok(response);
+  public ResponseEntity<UserDto.PostLoginRes> postLogin(@RequestBody UserDto.PostLoginReq postLoginReq) {
+    return ResponseEntity.ok(userService.login(postLoginReq));
   }
 }

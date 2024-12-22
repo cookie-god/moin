@@ -1,11 +1,8 @@
 package kisung.moin.controller.transfer;
 
-import kisung.moin.common.code.ErrorCode;
-import kisung.moin.common.response.BasicResponse;
 import kisung.moin.config.SecurityUtil;
 import kisung.moin.config.exception.MoinException;
 import kisung.moin.dto.TransferDto;
-import kisung.moin.dto.UserDto;
 import kisung.moin.entity.UserInfo;
 import kisung.moin.service.transfer.TransferService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static kisung.moin.common.code.SuccessCode.*;
+import static kisung.moin.common.code.ErrorCode.NON_EXIST_USER;
 
 @RestController
 @RequestMapping(value = "/transfer", consumes = "application/json", produces = "application/json")
@@ -24,9 +21,9 @@ import static kisung.moin.common.code.SuccessCode.*;
 public class TransferController {
   private final TransferService transferService;
 
-//  @PostMapping(value = "/quote")
-//  public BasicResponse<TransferDto.PostQuoteRes> postQuote(@RequestBody TransferDto.PostQuoteReq postQuoteReq) throws Exception {
-//    UserInfo userInfo = SecurityUtil.getUser().orElseThrow(() -> new MoinException(ErrorCode.NON_EXIST_USER));
-//    return BasicResponse.success(transferService.retrieveQuote(userInfo, postQuoteReq), READ_SUCCESS);
-//  }
+  @PostMapping(value = "/quote")
+  public TransferDto.PostQuoteRes postQuote(@RequestBody TransferDto.PostQuoteReq postQuoteReq) throws Exception {
+    UserInfo userInfo = SecurityUtil.getUser().orElseThrow(() -> new MoinException(NON_EXIST_USER));
+    return transferService.retrieveQuote(userInfo, postQuoteReq);
+  }
 }

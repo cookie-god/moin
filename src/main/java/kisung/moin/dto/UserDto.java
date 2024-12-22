@@ -1,7 +1,9 @@
 package kisung.moin.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kisung.moin.common.response.BasicResponse;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.regex.Pattern;
 
@@ -42,10 +44,8 @@ public class UserDto {
   }
 
   @Getter
-  @Builder
-  public static class PostSignUpRes {
-    @Schema(description = "유저 고유 아이디", example = "1")
-    private Long id;
+  @SuperBuilder
+  public static class PostSignUpRes extends BasicResponse {
   }
 
   @Data
@@ -67,8 +67,8 @@ public class UserDto {
   }
 
   @Getter
-  @Builder
-  public static class PostLoginRes {
+  @SuperBuilder
+  public static class PostLoginRes extends BasicResponse {
     @Schema(description = "jwt 토큰", example = "asdasdasd")
     private String token;
   }
