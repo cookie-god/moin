@@ -5,6 +5,8 @@ import kisung.moin.common.response.BasicResponse;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 public class TransferDto {
 
   @Data
@@ -22,6 +24,16 @@ public class TransferDto {
   @SuperBuilder
   public static class PostQuoteRes extends BasicResponse {
     @Schema(description = "체크용", example = "1")
-    private Long id;
+    private List<UpbitInfo> upbitInfos;
+  }
+
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class UpbitInfo {
+    String code;
+    String currencyCode;
+    Double basePrice;
+    Long currencyUnit;
   }
 }

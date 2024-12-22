@@ -25,6 +25,9 @@ public enum ErrorCode {
   WRONG_PASSWORD(404, "USER_ERROR_014", "User's password is wrong."),
   NON_EXIST_USER(404, "USER_ERROR_015", "Not exist user"),
 
+  WEB_CLIENT_ERROR(404, "CALL_ERROR_001", "Client error in Other Server"),
+  WEB_SERVER_ERROR(404, "CALL_ERROR_002", "Error in Other Server"),
+
 
   INTERNAL_SERVER_ERROR(500, "SERVER_ERROR_001", "Server Error");
 
