@@ -36,6 +36,9 @@ public class WebClientService {
         .timeout(Duration.ofSeconds(5)) // 5초 응답 체크
         .doOnError(e -> log.info("error 발생"))
         .onErrorResume(e -> Mono.empty())
-        .block();
+        .block()
+        .stream()
+        .filter(data -> data.getCode().equals("FRX.KRWJPY") || data.getCode().equals("FRX.KRWUSD"))
+        .toList();
   }
 }
