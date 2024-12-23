@@ -7,7 +7,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class TransferDto {
 
@@ -27,6 +26,20 @@ public class TransferDto {
   public static class PostQuoteRes extends BasicResponse {
     @Schema(description = "견적서 정보")
     private QuoteInfo quote;
+  }
+
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class PostQuoteRequestReq {
+    @Schema(description = "견적서 아이디", example = "1")
+    private Long quoteId;
+  }
+
+  @Getter
+  @SuperBuilder
+  public static class PostQuoteRequestRes extends BasicResponse {
   }
 
   @Data

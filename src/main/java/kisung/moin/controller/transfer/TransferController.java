@@ -26,4 +26,10 @@ public class TransferController {
     UserInfo userInfo = SecurityUtil.getUser().orElseThrow(() -> new MoinException(NON_EXIST_USER));
     return transferService.createQuotes(userInfo, postQuoteReq);
   }
+
+  @PostMapping(value = "/request")
+  public TransferDto.PostQuoteRequestRes postQuoteRequest(@RequestBody TransferDto.PostQuoteRequestReq postQuoteRequestReq) throws Exception {
+    UserInfo userInfo = SecurityUtil.getUser().orElseThrow(() -> new MoinException(NON_EXIST_USER));
+    return transferService.createQuoteRequests(userInfo, postQuoteRequestReq);
+  }
 }

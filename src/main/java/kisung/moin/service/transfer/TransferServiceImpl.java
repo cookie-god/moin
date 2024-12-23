@@ -2,10 +2,11 @@ package kisung.moin.service.transfer;
 
 import kisung.moin.config.exception.MoinException;
 import kisung.moin.dto.TransferDto;
-import kisung.moin.dto.UserDto;
 import kisung.moin.entity.Quote;
+import kisung.moin.entity.Transfer;
 import kisung.moin.entity.UserInfo;
 import kisung.moin.repository.quote.QuoteRepository;
+import kisung.moin.repository.transfer.TransferRepository;
 import kisung.moin.service.webclient.WebClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import static kisung.moin.enums.Status.ACTIVE;
 @Slf4j
 public class TransferServiceImpl implements TransferService {
   private final QuoteRepository quoteRepository;
+  private final TransferRepository transferRepository;
   private final WebClientService webClientService;
 
   @Transactional
@@ -52,6 +54,19 @@ public class TransferServiceImpl implements TransferService {
                 .build()
         )
         .build();
+  }
+
+  @Transactional
+  @Override
+  public TransferDto.PostQuoteRequestRes createQuoteRequests(UserInfo userInfo, TransferDto.PostQuoteRequestReq postQuoteRequestReq) {
+    validate(postQuoteRequestReq);
+    Quote quote = quoteRepository.findQuoteById(postQuoteRequestReq.getQuoteId()).orElseThrow(() -> new MoinException(NON_EXIST_QUOTE));
+    if (quote.getExpireTime().isBefore(LocalDateTime.now())) {
+      throw new MoinException(INVALID_QUOTE);
+    }
+    Transfer transfer = createTransferEntity(userInfo, quote);
+    transferRepository.save(transfer);
+    return TransferDto.PostQuoteRequestRes.builder().build();
   }
 
   /**
@@ -83,7 +98,6 @@ public class TransferServiceImpl implements TransferService {
       fee = amount.multiply(jpyRate).setScale(12, HALF_UP);
       fee = fee.add(fixedFeeJpy);
     }
-
     return fee;
   }
 
@@ -99,26 +113,6 @@ public class TransferServiceImpl implements TransferService {
     BigDecimal rate = BigDecimal.valueOf(upbitInfo.getBasePrice() / upbitInfo.getCurrencyUnit()).setScale(12, HALF_UP);
     Currency usd = Currency.getInstance(upbitInfo.getCurrencyCode());
     return netAmount.divide(rate, usd.getDefaultFractionDigits(), RoundingMode.HALF_UP);
-  }
-
-  /**
-   * 견적서 엔티티 인스턴스 생성하는 메서드
-   */
-  private Quote createQuoteEntity(UserInfo userInfo, String code, String currencyCode, Double amount, Double fee, Double exchangeRate, Double targetAmount) {
-    LocalDateTime now = LocalDateTime.now();
-    return Quote.builder()
-        .userInfo(userInfo)
-        .code(code)
-        .currencyCode(currencyCode)
-        .amount(amount)
-        .fee(fee)
-        .exchangeRate(exchangeRate)
-        .targetAmount(targetAmount)
-        .expireTime(now.plusMinutes(10))
-        .createdAt(now)
-        .updatedAt(now)
-        .status(ACTIVE.value())
-        .build();
   }
 
   /**
@@ -142,6 +136,55 @@ public class TransferServiceImpl implements TransferService {
     if (!List.of("JPY", "USD").contains(postQuoteReq.getTargetCurrency())) {
       throw new MoinException(INVALID_TARGET_CURRENCY);
     }
+  }
+
+  /**
+   * 송금 접수 요청 validate
+   * request에 대한 값 체크하는 메서드
+   * 1. 견적서 아이디 존재 여부 체크
+   * 2. 금액 음수값 체크
+   * 3. 환전 나라 존재 여부 체크
+   * 4. 환전 가능 나라 체크
+   */
+  private void validate(TransferDto.PostQuoteRequestReq postQuoteRequestReq) {
+    if (postQuoteRequestReq.getQuoteId() == null || postQuoteRequestReq.getQuoteId() == 0) {
+      throw new MoinException(NON_EXIST_QUOTE_ID);
+    }
+  }
+
+  /**
+   * 견적서 엔티티 인스턴스 생성하는 메서드
+   */
+  private Quote createQuoteEntity(UserInfo userInfo, String code, String currencyCode, Double amount, Double fee, Double exchangeRate, Double targetAmount) {
+    LocalDateTime now = LocalDateTime.now();
+    return Quote.builder()
+        .userInfo(userInfo)
+        .code(code)
+        .currencyCode(currencyCode)
+        .amount(amount)
+        .fee(fee)
+        .exchangeRate(exchangeRate)
+        .targetAmount(targetAmount)
+        .expireTime(now.plusMinutes(10))
+        .createdAt(now)
+        .updatedAt(now)
+        .status(ACTIVE.value())
+        .build();
+  }
+
+  /**
+   * 견적서 엔티티 인스턴스 생성하는 메서드
+   */
+  private Transfer createTransferEntity(UserInfo userInfo, Quote quote) {
+    LocalDateTime now = LocalDateTime.now();
+    return Transfer.builder()
+        .userInfo(userInfo)
+        .quote(quote)
+        .requestedDate(now)
+        .createdAt(now)
+        .updatedAt(now)
+        .status(ACTIVE.value())
+        .build();
   }
 
 }

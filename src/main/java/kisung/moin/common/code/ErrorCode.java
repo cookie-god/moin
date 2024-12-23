@@ -27,6 +27,9 @@ public enum ErrorCode {
   INVALID_AMOUNT(400, "QUOTE_ERROR_002", "Amount is negative number"),
   NON_EXIST_TARGET_CURRENCY(400, "QUOTE_ERROR_003", "Target Currency is empty"),
   INVALID_TARGET_CURRENCY(400, "QUOTE_ERROR_004", "Target Currency is only JPY, USD"),
+  NON_EXIST_QUOTE_ID(400, "QUOTE_ERROR_005", "Quote id is empty"),
+  NON_EXIST_QUOTE(404, "QUOTE_ERROR_006", "Not exist quote"),
+  INVALID_QUOTE(404, "QUOTE_ERROR_007", "Quote's expire time is over 10 minutes"),
 
   WEB_CLIENT_ERROR(404, "CALL_ERROR_001", "Client error in Other Server"),
   WEB_SERVER_ERROR(404, "CALL_ERROR_002", "Error in Other Server"),
