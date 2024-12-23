@@ -21,6 +21,7 @@ import java.util.List;
 
 import static java.math.RoundingMode.HALF_UP;
 import static kisung.moin.common.code.ErrorCode.*;
+import static kisung.moin.enums.IdType.REG_NO;
 import static kisung.moin.enums.Status.ACTIVE;
 
 @Service
@@ -34,15 +35,15 @@ public class TransferServiceImpl implements TransferService {
   @Transactional
   @Override
   public TransferDto.PostQuoteRes createQuotes(UserInfo userInfo, TransferDto.PostQuoteReq postQuoteReq) {
-    validate(postQuoteReq);
-    TransferDto.UpbitInfo upbitInfo = webClientService.retrieveUpbitPriceInfo().stream()
+    validate(postQuoteReq); // request에 대한 검증
+    TransferDto.UpbitInfo upbitInfo = webClientService.retrieveUpbitPriceInfo().stream() // 업비트 가격 정보 api를 통해 미국 또는 일본 환전 정보 확인
         .filter(data -> data.getCurrencyCode().equals(postQuoteReq.getTargetCurrency())).findFirst()
         .orElseThrow(() -> new MoinException(INTERNAL_SERVER_ERROR)); // 업비트 가격 정보
-    BigDecimal fee = makeFee(postQuoteReq.getTargetCurrency(), BigDecimal.valueOf(postQuoteReq.getAmount()));
-    BigDecimal targetAmount = makeTargetAmount(BigDecimal.valueOf(postQuoteReq.getAmount()), fee, upbitInfo);
-    Double exchangeRate = upbitInfo.getBasePrice() / upbitInfo.getCurrencyUnit();
-    Quote quote = createQuoteEntity(userInfo, upbitInfo.getCode(), upbitInfo.getCurrencyCode(), postQuoteReq.getAmount(), fee.doubleValue(), exchangeRate, targetAmount.doubleValue());
-    quote = quoteRepository.save(quote);
+    BigDecimal fee = makeFee(postQuoteReq.getTargetCurrency(), BigDecimal.valueOf(postQuoteReq.getAmount())); // 수수료 계산
+    BigDecimal targetAmount = makeTargetAmount(BigDecimal.valueOf(postQuoteReq.getAmount()), fee, upbitInfo); // 목표 송금액 계산
+    Double exchangeRate = upbitInfo.getBasePrice() / upbitInfo.getCurrencyUnit(); // 기본 단위량 계산
+    Quote quote = createQuoteEntity(userInfo, upbitInfo.getCode(), upbitInfo.getCurrencyCode(), postQuoteReq.getAmount(), fee.doubleValue(), exchangeRate, targetAmount.doubleValue()); // 견적서 엔티티 생성
+    quote = quoteRepository.save(quote); // 저장
 
     return TransferDto.PostQuoteRes.builder()
         .quote(
@@ -59,13 +60,31 @@ public class TransferServiceImpl implements TransferService {
   @Transactional
   @Override
   public TransferDto.PostQuoteRequestRes createQuoteRequests(UserInfo userInfo, TransferDto.PostQuoteRequestReq postQuoteRequestReq) {
-    validate(postQuoteRequestReq);
-    Quote quote = quoteRepository.findQuoteById(postQuoteRequestReq.getQuoteId()).orElseThrow(() -> new MoinException(NON_EXIST_QUOTE));
-    if (quote.getExpireTime().isBefore(LocalDateTime.now())) {
+    validate(postQuoteRequestReq); // request에 대한 검증
+    Quote quote = quoteRepository.findQuoteById(postQuoteRequestReq.getQuoteId()).orElseThrow(() -> new MoinException(NON_EXIST_QUOTE)); // 견적서 조회 및 에러 처리
+    if (quote.getExpireTime().isBefore(LocalDateTime.now())) { // 견적서 만료기한 체크
       throw new MoinException(INVALID_QUOTE);
     }
-    Transfer transfer = createTransferEntity(userInfo, quote);
-    transferRepository.save(transfer);
+    Transfer checkTransfer = transferRepository.findTransferByQuoteId(quote.getId()).orElse(null); // 해당 견적서에 대한 송금 요청 존재 여부 체크
+    if (checkTransfer != null) { // 견적서 이미 존재하는 경우 에러 처리
+      throw new MoinException(ALREADY_EXIST_TRANSFER);
+    }
+    TransferDto.UpbitInfo upbitInfo = webClientService.retrieveUpbitPriceInfo().stream() // 업비트 가격 정보 api를 통해 미국 달러 확인
+        .filter(data -> data.getCurrencyCode().equals("USD")).findFirst()
+        .orElseThrow(() -> new MoinException(INTERNAL_SERVER_ERROR)); // 업비트 가격 정보
+
+    double limitedAmount = makeLimitAmount(userInfo, upbitInfo); // 유저별 최대 송금 금액 계산
+    double totalAmount = transferRepository.findTransferAmountByUserId(userInfo.getId()); // 송금 금액 확인
+
+    log.info("limitedAmount = {}", limitedAmount);
+    log.info("totalAmount = {}", totalAmount);
+    log.info("totalAmount with amount = {}", totalAmount + quote.getAmount());
+
+    if (limitedAmount < totalAmount + quote.getAmount()) { // 송금하려는 금액과 이전 송금량이 유저별 최대 송금 금액보다 큰 경우 에러 처리
+      throw new MoinException(QUOTE_LIMIT_EXCESS);
+    }
+    Transfer transfer = createTransferEntity(userInfo, quote); // 송금 엔티티 생성
+    transferRepository.save(transfer); // 저장
     return TransferDto.PostQuoteRequestRes.builder().build();
   }
 
@@ -77,26 +96,26 @@ public class TransferServiceImpl implements TransferService {
    * 4. 수수료율 계산
    */
   private BigDecimal makeFee(String targetCurrency, BigDecimal amount) {
-    BigDecimal fee;
-    BigDecimal oneMillion = new BigDecimal("1000000");
-    BigDecimal usdRateLow = new BigDecimal("0.002");
-    BigDecimal usdRateHigh = new BigDecimal("0.001");
-    BigDecimal jpyRate = new BigDecimal("0.005");
-    BigDecimal fixedFeeUsdLow = new BigDecimal("1000");
-    BigDecimal fixedFeeUsdHigh = new BigDecimal("3000");
-    BigDecimal fixedFeeJpy = new BigDecimal("3000");
+    BigDecimal fee; // 수수료
+    BigDecimal oneMillion = new BigDecimal("1000000"); // 미국 달러 100만원 기준점
+    BigDecimal usdRateLow = new BigDecimal("0.002"); // 미국 달러 100만원 이하 수수료 0.2%
+    BigDecimal usdRateHigh = new BigDecimal("0.001"); // 미국 달러 100만원 초과 수수료 0.1%
+    BigDecimal jpyRate = new BigDecimal("0.005"); // 일본 엔화 수수료 0.5%
+    BigDecimal fixedFeeUsdLow = new BigDecimal("1000"); // 미국 달러 100만원 이하 고정 수수료 1000원
+    BigDecimal fixedFeeUsdHigh = new BigDecimal("3000"); // 미국 달러 100만원 초과 고정 수수료 3000원
+    BigDecimal fixedFeeJpy = new BigDecimal("3000"); // 일본 엔화 고정 수수료 3000원
 
     if ("USD".equals(targetCurrency)) {
       if (amount.compareTo(oneMillion) <= 0) {
-        fee = amount.multiply(usdRateLow).setScale(12, HALF_UP);
-        fee = fee.add(fixedFeeUsdLow);
+        fee = amount.multiply(usdRateLow).setScale(12, HALF_UP); // 12자리 계산
+        fee = fee.add(fixedFeeUsdLow); // 고정 수수료 더함
       } else {
-        fee = amount.multiply(usdRateHigh).setScale(12, HALF_UP);
-        fee = fee.add(fixedFeeUsdHigh);
+        fee = amount.multiply(usdRateHigh).setScale(12, HALF_UP); // 12자리 계산
+        fee = fee.add(fixedFeeUsdHigh); // 고정 수수료 더함
       }
     } else {
-      fee = amount.multiply(jpyRate).setScale(12, HALF_UP);
-      fee = fee.add(fixedFeeJpy);
+      fee = amount.multiply(jpyRate).setScale(12, HALF_UP); // 12자리 계산
+      fee = fee.add(fixedFeeJpy); // 고정 수수료 더함
     }
     return fee;
   }
@@ -109,10 +128,22 @@ public class TransferServiceImpl implements TransferService {
    * 4. 수수료율 계산
    */
   private BigDecimal makeTargetAmount(BigDecimal amount, BigDecimal fee, TransferDto.UpbitInfo upbitInfo) {
-    BigDecimal netAmount = amount.subtract(fee).setScale(12, HALF_UP);
-    BigDecimal rate = BigDecimal.valueOf(upbitInfo.getBasePrice() / upbitInfo.getCurrencyUnit()).setScale(12, HALF_UP);
-    Currency usd = Currency.getInstance(upbitInfo.getCurrencyCode());
-    return netAmount.divide(rate, usd.getDefaultFractionDigits(), RoundingMode.HALF_UP);
+    BigDecimal netAmount = amount.subtract(fee).setScale(12, HALF_UP); // 기존 금액에서 수수료 뺌
+    BigDecimal rate = BigDecimal.valueOf(upbitInfo.getBasePrice() / upbitInfo.getCurrencyUnit()).setScale(12, HALF_UP); // 통화 단위로 환전 진행
+    Currency usd = Currency.getInstance(upbitInfo.getCurrencyCode()); // 통화 단위로 소수점 반올림 하기 위해 사용
+    return netAmount.divide(rate, usd.getDefaultFractionDigits(), RoundingMode.HALF_UP); // 통화 단위로 계산
+  }
+
+  /**
+   * 회원별 일별 송금 요청 금액 확인
+   * 1. 회원별 정의
+   */
+  private double makeLimitAmount(UserInfo userInfo, TransferDto.UpbitInfo upbitInfo) {
+    if (userInfo.getIdType().equals(REG_NO.value())) {
+      return upbitInfo.getBasePrice() * 1000;
+    } else {
+      return upbitInfo.getBasePrice() * 5000;
+    }
   }
 
   /**
@@ -186,5 +217,4 @@ public class TransferServiceImpl implements TransferService {
         .status(ACTIVE.value())
         .build();
   }
-
 }
