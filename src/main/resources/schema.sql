@@ -17,6 +17,8 @@ CREATE TABLE QUOTE (
    currency_code VARCHAR(10) NOT NULL,
    amount DOUBLE NOT NULL,
    fee DOUBLE NOT NULL,
+   usd_exchange_rate DOUBLE NOT NULL,
+   usd_target_amount DOUBLE NOT NULL,
    exchange_rate DOUBLE NOT NULL,
    target_amount DOUBLE NOT NULL,
    expire_time TIMESTAMP NOT NULL,

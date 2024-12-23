@@ -36,15 +36,17 @@ public class TransferServiceImpl implements TransferService {
   @Override
   public TransferDto.PostQuoteRes createQuotes(UserInfo userInfo, TransferDto.PostQuoteReq postQuoteReq) {
     validate(postQuoteReq); // request에 대한 검증
-    TransferDto.UpbitInfo upbitInfo = webClientService.retrieveUpbitPriceInfo().stream() // 업비트 가격 정보 api를 통해 미국 또는 일본 환전 정보 확인
-        .filter(data -> data.getCurrencyCode().equals(postQuoteReq.getTargetCurrency())).findFirst()
-        .orElseThrow(() -> new MoinException(INTERNAL_SERVER_ERROR)); // 업비트 가격 정보
+    List<TransferDto.UpbitInfo> upbitInfos = webClientService.retrieveUpbitPriceInfo();
+    TransferDto.UpbitInfo usdUpbitInfo = upbitInfos.stream().filter(data -> data.getCurrencyCode().equals("USD")).findFirst().orElseThrow(() -> new MoinException(INTERNAL_SERVER_ERROR)); // usd 환율 정보 확인
+    TransferDto.UpbitInfo upbitInfo = upbitInfos.stream().filter(data -> data.getCurrencyCode().equals(postQuoteReq.getTargetCurrency())).findFirst().orElseThrow(() -> new MoinException(INTERNAL_SERVER_ERROR)); // request에 맞는 환율 정보 확인
     BigDecimal fee = makeFee(postQuoteReq.getTargetCurrency(), BigDecimal.valueOf(postQuoteReq.getAmount())); // 수수료 계산
     BigDecimal targetAmount = makeTargetAmount(BigDecimal.valueOf(postQuoteReq.getAmount()), fee, upbitInfo); // 목표 송금액 계산
+    BigDecimal usdFee = makeFee("USD", BigDecimal.valueOf(postQuoteReq.getAmount())); // 달러 수수료 계산
+    BigDecimal usdTargetAmount = makeTargetAmount(BigDecimal.valueOf(postQuoteReq.getAmount()), usdFee, usdUpbitInfo); // 달러 목표 송금액 계산
     Double exchangeRate = upbitInfo.getBasePrice() / upbitInfo.getCurrencyUnit(); // 기본 단위량 계산
-    Quote quote = createQuoteEntity(userInfo, upbitInfo.getCode(), upbitInfo.getCurrencyCode(), postQuoteReq.getAmount(), fee.doubleValue(), exchangeRate, targetAmount.doubleValue()); // 견적서 엔티티 생성
+    Double usdExchangeRate = usdUpbitInfo.getBasePrice() / usdUpbitInfo.getCurrencyUnit(); // 달러 기본 단위량 계산
+    Quote quote = createQuoteEntity(userInfo, upbitInfo.getCode(), upbitInfo.getCurrencyCode(), usdExchangeRate, usdTargetAmount.doubleValue(), postQuoteReq.getAmount(), fee.doubleValue(), exchangeRate, targetAmount.doubleValue()); // 견적서 엔티티 생성
     quote = quoteRepository.save(quote); // 저장
-
     return TransferDto.PostQuoteRes.builder()
         .quote(
             TransferDto.QuoteInfo.builder()
@@ -186,12 +188,14 @@ public class TransferServiceImpl implements TransferService {
   /**
    * 견적서 엔티티 인스턴스 생성하는 메서드
    */
-  private Quote createQuoteEntity(UserInfo userInfo, String code, String currencyCode, Double amount, Double fee, Double exchangeRate, Double targetAmount) {
+  private Quote createQuoteEntity(UserInfo userInfo, String code, String currencyCode, Double usdExchangeRate, Double usdTargetAmount, Double amount, Double fee, Double exchangeRate, Double targetAmount) {
     LocalDateTime now = LocalDateTime.now();
     return Quote.builder()
         .userInfo(userInfo)
         .code(code)
         .currencyCode(currencyCode)
+        .usdExchangeRate(usdExchangeRate)
+        .usdTargetAmount(usdTargetAmount)
         .amount(amount)
         .fee(fee)
         .exchangeRate(exchangeRate)

@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import kisung.moin.entity.base.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,6 +34,12 @@ public class Quote extends BaseEntity {
 
   @Column(name = "fee")
   private Double fee;
+
+  @Column(name = "usd_exchange_rate")
+  private Double usdExchangeRate;
+
+  @Column(name = "usd_target_amount")
+  private Double usdTargetAmount;
 
   @Column(name = "exchange_rate")
   private Double exchangeRate;
