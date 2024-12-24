@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 import java.util.regex.Pattern;
 
 public class UserDto {
-  private static final String USER_ID_PATTERN = "^[a-z0-9A-Z._-]*@[a-z0-9A-Z]*.[a-zA-Z.]*$";
+  private static final String USER_ID_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
   private static final String PASSWORD_PATTERN = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$";
   private static final String REG_ID_VALUE_PATTERN = "^\\d{6}-?\\d{7}$";
   private static final String BUSINESS_ID_VALUE_PATTERN = "^\\d{3}-\\d{2}-\\d{5}$";
