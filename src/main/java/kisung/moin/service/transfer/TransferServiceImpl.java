@@ -97,7 +97,7 @@ public class TransferServiceImpl implements TransferService {
         .userId(userInfo.getUserId())
         .name(userInfo.getName())
         .todayTransferCount(1) // TODO: 계산하기
-        .todayTransferUsdAmount(457.10) // TODO: 계산하기
+        .todayTransferUsdAmount(457.00) // TODO: 계산하기
         .history(transferInfos)
         .build();
   }

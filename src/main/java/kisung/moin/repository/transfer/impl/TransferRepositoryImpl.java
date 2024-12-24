@@ -74,6 +74,9 @@ public class TransferRepositoryImpl implements CustomTransferRepository {
             transfer.userInfo.id.eq(id),
             transfer.status.eq(ACTIVE.value())
         )
+        .orderBy(
+            transfer.requestedDate.desc()
+        )
         .fetch();
   }
 }

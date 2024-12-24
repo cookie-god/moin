@@ -99,7 +99,7 @@ public class TransferDto {
     @Schema(description = "받는 환율 정보", example = "JPY")
     private String targetCurrency;
     @Schema(description = "환율", example = "9.013")
-    private Double exchageRate;
+    private Double exchangeRate;
     @Schema(description = "환전후 금액", example = "630.91")
     private Double targetAmount;
     @Schema(description = "송금 요청 시간")
