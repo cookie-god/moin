@@ -90,6 +90,18 @@ public class TransferServiceImpl implements TransferService {
     return TransferDto.PostQuoteRequestRes.builder().build();
   }
 
+  @Override
+  public TransferDto.GetTransfersRes retrieveTransfers(UserInfo userInfo) {
+    List<TransferDto.TransferInfo> transferInfos = transferRepository.findTransferHistoriesByUserId(userInfo.getId());
+    return TransferDto.GetTransfersRes.builder()
+        .userId(userInfo.getUserId())
+        .name(userInfo.getName())
+        .todayTransferCount(1) // TODO: 계산하기
+        .todayTransferUsdAmount(457.10) // TODO: 계산하기
+        .history(transferInfos)
+        .build();
+  }
+
   /**
    * 수수료 계산
    * 1. USD or JPY 나누기

@@ -84,6 +84,8 @@ public class TransferDto {
   }
 
   @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
   @Builder
   public static class TransferInfo {
     @Schema(description = "원화 송금 요청액", example = "10000")

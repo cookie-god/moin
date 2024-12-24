@@ -1,6 +1,8 @@
 package kisung.moin.repository.transfer.impl;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import kisung.moin.dto.TransferDto;
 import kisung.moin.entity.Transfer;
 import kisung.moin.repository.transfer.custom.CustomTransferRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import static kisung.moin.entity.QQuote.quote;
@@ -49,5 +52,28 @@ public class TransferRepositoryImpl implements CustomTransferRepository {
             )
             .fetchFirst()
     );
+  }
+
+  @Override
+  public List<TransferDto.TransferInfo> findTransferHistoriesByUserId(Long id) {
+    return jpaQueryFactory
+        .select(
+            Projections.bean(TransferDto.TransferInfo.class,
+                quote.amount.as("sourceAmount"),
+                quote.fee,
+                quote.usdExchangeRate,
+                quote.usdTargetAmount.as("usdAmount"),
+                quote.currencyCode.as("targetCurrency"),
+                quote.exchangeRate,
+                quote.targetAmount,
+                transfer.requestedDate
+            )
+        )
+        .from(transfer).leftJoin(quote).on(transfer.quote.id.eq(quote.id)).fetchJoin()
+        .where(
+            transfer.userInfo.id.eq(id),
+            transfer.status.eq(ACTIVE.value())
+        )
+        .fetch();
   }
 }
