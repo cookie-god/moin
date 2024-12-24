@@ -26,7 +26,7 @@ public class UserController {
   @Operation(summary = "회원 가입 API", description = "회원 가입")
   @PostMapping(value = "/signup")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Success"),
+      @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "USER_ERROR_001", description = "Email is empty",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(responseCode = "USER_ERROR_004", description = "Email is invalid",
@@ -59,7 +59,7 @@ public class UserController {
   @Operation(summary = "로그인 API", description = "로그인")
   @PostMapping(value = "/login")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Success"),
+      @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "USER_ERROR_001", description = "Email is empty",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(responseCode = "USER_ERROR_004", description = "Email is invalid",

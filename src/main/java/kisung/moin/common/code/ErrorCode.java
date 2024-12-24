@@ -31,7 +31,7 @@ public enum ErrorCode {
   NON_EXIST_QUOTE_ID(400, "QUOTE_ERROR_006", "Quote id is empty"),
   NON_EXIST_QUOTE(404, "QUOTE_ERROR_007", "Not exist quote"),
   INVALID_QUOTE(404, "QUOTE_ERROR_008", "Quote's expire time is over 10 minutes"),
-  QUOTE_LIMIT_EXCESS(404, "QUOTE_ERROR_009", "Daliy limit is over"),
+  QUOTE_LIMIT_EXCESS(404, "QUOTE_ERROR_009", "Daily limit is over"),
   ALREADY_EXIST_TRANSFER(404, "QUOTE_ERROR_010", "Already exist transfer"),
 
   WEB_CLIENT_ERROR(404, "CALL_ERROR_001", "Client error in Other Server"),
