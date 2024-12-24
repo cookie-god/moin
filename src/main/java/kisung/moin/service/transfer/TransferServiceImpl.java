@@ -175,6 +175,9 @@ public class TransferServiceImpl implements TransferService {
       throw new MoinException(NON_EXIST_AMOUNT);
     }
     if (postQuoteReq.getAmount() < 0) {
+      throw new MoinException(NEGATIVE_NUMBER);
+    }
+    if (postQuoteReq.getAmount() < 10000) {
       throw new MoinException(INVALID_AMOUNT);
     }
     if (postQuoteReq.getTargetCurrency() == null || postQuoteReq.getTargetCurrency().isEmpty()) {

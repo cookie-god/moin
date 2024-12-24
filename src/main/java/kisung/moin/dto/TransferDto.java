@@ -17,7 +17,7 @@ public class TransferDto {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class PostQuoteReq {
-    @Schema(description = "금액", example = "10000")
+    @Schema(description = "금액 (10000원 이상)", example = "10000")
     private Double amount;
     @Schema(description = "환전 나라", example = "JPY")
     private String targetCurrency;
