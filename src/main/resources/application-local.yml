@@ -31,7 +31,7 @@ spring:
         format_sql: true
 
 jwt:
-  expiration_time: 259200000 #3일
+  expiration_time: 1800000 #30분
   secret: cookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegodcookiegod
 
 aes:
