@@ -31,22 +31,22 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @Override
   public UserDto.PostSignUpRes createUsers(UserDto.PostSignUpReq postSignUpReq) throws Exception {
-    validate(postSignUpReq);
-    UserInfo userInfo = createUserEntity(postSignUpReq);
-    userInfo = userInfo.hashPassword(bCryptPasswordEncoder);
-    userInfo.encryptIdValue(aesUtil.encrypt(postSignUpReq.getIdValue()));
-    userRepository.save(userInfo);
+    validate(postSignUpReq); // request에 대한 유효성 검사
+    UserInfo userInfo = createUserEntity(postSignUpReq); // 유저 엔티티 생성
+    userInfo = userInfo.hashPassword(bCryptPasswordEncoder); // 비밀번호 암호화
+    userInfo.encryptIdValue(aesUtil.encrypt(postSignUpReq.getIdValue())); // id value값 암호화
+    userRepository.save(userInfo); // 저장
     return UserDto.PostSignUpRes.builder().build();
   }
 
   @Override
   public UserDto.PostLoginRes login(UserDto.PostLoginReq postLoginReq) {
-    validate(postLoginReq);
-    UserInfo userInfo = userRepository.findUserInfoByUserId(postLoginReq.getUserId()).orElseThrow(() -> new MoinException(NON_EXIST_USER));
+    validate(postLoginReq); // request에 대한 유효성 검사
+    UserInfo userInfo = userRepository.findUserInfoByUserId(postLoginReq.getUserId()).orElseThrow(() -> new MoinException(NON_EXIST_USER)); // 유저 조회 및 에러 처리
     if (!userInfo.checkPassword(postLoginReq.getPassword(), bCryptPasswordEncoder)) { // 비밀번호 확인
       throw new MoinException(WRONG_PASSWORD);
     }
-    String token = jwtTokenProvider.createAccessToken(
+    String token = jwtTokenProvider.createAccessToken( // access token 생성
         UserDto.UserBasicInfo.builder()
             .id(userInfo.getId())
             .userId(userInfo.getUserId())
