@@ -1,11 +1,6 @@
 package kisung.moin.controller.user;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import kisung.moin.common.response.ErrorResponse;
 import kisung.moin.controller.user.swagger.PostUserLoginSwaggerResponse;
 import kisung.moin.controller.user.swagger.PostUserSignUpSwaggerResponse;
 import kisung.moin.dto.UserDto;

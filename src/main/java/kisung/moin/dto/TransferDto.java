@@ -56,7 +56,7 @@ public class TransferDto {
     @Schema(description = "오늘 송금 금액", example = "457.10")
     private Double todayTransferUsdAmount;
     @Schema(description = "송금 내역")
-    private List<TransferInfo> history = new ArrayList<>();
+    private List<TransferInfo> history;
   }
 
 
