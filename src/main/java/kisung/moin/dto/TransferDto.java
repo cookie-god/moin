@@ -52,7 +52,7 @@ public class TransferDto {
     @Schema(description = "이름", example = "구기성")
     private String name;
     @Schema(description = "오늘 송금 횟수", example = "1")
-    private Integer todayTransferCount;
+    private Long todayTransferCount;
     @Schema(description = "오늘 송금 금액", example = "457.10")
     private Double todayTransferUsdAmount;
     @Schema(description = "송금 내역")

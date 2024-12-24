@@ -79,4 +79,21 @@ public class TransferRepositoryImpl implements CustomTransferRepository {
         )
         .fetch();
   }
+
+  @Override
+  public Long findTransferCountByUserId(Long id) {
+    LocalDate today = LocalDate.now(); // 오늘 날짜
+    LocalDateTime startOfDay = today.atStartOfDay(); // 오늘의 00:00:00
+    LocalDateTime endOfDay = today.atTime(LocalTime.MAX); // 오늘의 23:59:59.999
+
+    return jpaQueryFactory
+        .select(transfer.count())
+        .from(transfer)
+        .where(
+            transfer.userInfo.id.eq(id),
+            transfer.requestedDate.between(startOfDay, endOfDay),
+            transfer.status.eq(ACTIVE.value())
+        )
+        .fetchFirst();
+  }
 }

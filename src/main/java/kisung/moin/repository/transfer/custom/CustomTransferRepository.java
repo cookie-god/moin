@@ -10,4 +10,5 @@ public interface CustomTransferRepository {
   Double findTransferAmountByUserId(Long id);
   Optional<Transfer> findTransferByQuoteId(Long quoteId);
   List<TransferDto.TransferInfo> findTransferHistoriesByUserId(Long id);
+  Long findTransferCountByUserId(Long id);
 }

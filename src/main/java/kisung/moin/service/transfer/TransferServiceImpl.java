@@ -92,12 +92,14 @@ public class TransferServiceImpl implements TransferService {
 
   @Override
   public TransferDto.GetTransfersRes retrieveTransfers(UserInfo userInfo) {
-    List<TransferDto.TransferInfo> transferInfos = transferRepository.findTransferHistoriesByUserId(userInfo.getId());
+    List<TransferDto.TransferInfo> transferInfos = transferRepository.findTransferHistoriesByUserId(userInfo.getId()); // 송금 내역 조회
+    double todayTransferUsdAmount = transferRepository.findTransferAmountByUserId(userInfo.getId()); // 금일 송금 금액 확인
+    Long todayTransferCount = transferRepository.findTransferCountByUserId(userInfo.getId()); // 금일 송금 횟수 확인
     return TransferDto.GetTransfersRes.builder()
         .userId(userInfo.getUserId())
         .name(userInfo.getName())
-        .todayTransferCount(1) // TODO: 계산하기
-        .todayTransferUsdAmount(457.00) // TODO: 계산하기
+        .todayTransferCount(todayTransferCount)
+        .todayTransferUsdAmount(todayTransferUsdAmount)
         .history(transferInfos)
         .build();
   }
